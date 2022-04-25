@@ -5,7 +5,7 @@
 
   header("Content-Type: application/json");
 
-  if (isset($_GET["type"]) && $_SERVER["REQUEST_METHOD"] == "GET") {
+  if (($_GET["type"] == "register" || $_GET["type"] == "login") && $_SERVER["REQUEST_METHOD"] == "POST") {
     $type = $_GET["type"];
 
     if (isset($_GET["username"]) && isset($_GET["password"])) {
@@ -61,18 +61,6 @@
 
       return;
     }
-
-    if ($type == "blogs") {
-      $sql    = "select * from blogs";
-      $result = $conn->query($sql);
-
-      $data = array();
-      while ($row = $result->fetch_assoc()) {
-        $data[] = $row;
-      }
-
-      echo json_encode($data);
-    }
   }
 
   function valueExists(string $column, string $value, mixed $conn): int
@@ -96,15 +84,27 @@
     return true;
   }
 
-  // Post a micro-blog
-  if (isset($_GET["type"]) && $_SERVER["REQUEST_METHOD"] == "POST") {
-    $blogPost = json_decode(file_get_contents("php://input"));
+  // Post an echo
+  if ($_GET["type"] == "echo" && $_GET["action"] == "post" && $_SERVER["REQUEST_METHOD"] == "POST") {
+    $echoPost = json_decode(file_get_contents("php://input"));
 
-    $user    = $blogPost->user;
-    $content = $blogPost->content;
+    $username    = $echoPost->username;
+    $content = $echoPost->content;
 
-    $sql = "insert into blogs (user_id, content) values ('$user', '$content')";
+    $sql = "insert into echoes (username, content) values ('$username', '$content')";
     $conn->query($sql);
 
-    echo json_encode(array("code" => 200, "message" => "Blog posted with success."));
+    echo json_encode(array("code" => 200, "message" => "Echo posted with success."));
+  }
+
+  if ($_GET["type"] == "echo" && $_GET["action"] = "get" && $_SERVER["REQUEST_METHOD"] == "POST") {
+    $sql    = "select * from echoes";
+    $result = $conn->query($sql);
+
+    $data = array();
+    while ($row = $result->fetch_assoc()) {
+      $data[] = $row;
+    }
+
+    echo json_encode($data);
   }

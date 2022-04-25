@@ -8,11 +8,10 @@ CREATE TABLE users
     last_name  VARCHAR(255)
 );
 
-CREATE TABLE blogs
+CREATE TABLE echoes
 (
     id         INTEGER PRIMARY KEY AUTO_INCREMENT,
-    user_id    INTEGER NOT NULL,
-    content    TEXT    NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users (id)
+    username   VARCHAR(255) NOT NULL REFERENCES users (username),
+    content    TEXT         NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
