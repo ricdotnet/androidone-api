@@ -98,7 +98,7 @@
   }
 
   if ($_GET["type"] == "echo" && $_GET["action"] = "get" && $_SERVER["REQUEST_METHOD"] == "POST") {
-    $sql    = "select * from echoes";
+    $sql    = "select * from echoes order by id desc";
     $result = $conn->query($sql);
 
     $data = array();
