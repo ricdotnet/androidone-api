@@ -88,8 +88,9 @@
   if ($_GET["type"] == "echo" && $_GET["action"] == "post" && $_SERVER["REQUEST_METHOD"] == "POST") {
     $echoPost = json_decode(file_get_contents("php://input"));
 
-    $username    = $echoPost->username;
-    $content = $echoPost->content;
+    $username = $echoPost->username;
+    $content  = $echoPost->content;
+    $avatar   = $echoPost->avatar;
 
     $sql = "insert into echoes (username, content) values ('$username', '$content')";
     $conn->query($sql);
@@ -107,4 +108,14 @@
     }
 
     echo json_encode($data);
+  }
+
+  if ($_GET["type"] == "avatar" && $_SERVER["REQUEST_METHOD"] == "POST") {
+    $target_dir  = "./images/";
+    $target_file = $target_dir . basename($_FILES["avatar"]["name"]);
+    if (move_uploaded_file($_FILES["avatar"]["tmp_name"], $target_file)) {
+      echo "uploaded...";
+    } else {
+      echo $_FILES["avatar"]["error"];
+    }
   }
