@@ -24,7 +24,12 @@
         $result = $conn->query($sql);
 
         if ($result->num_rows > 0) {
-          echo json_encode(array("username" => $username, "message" => "Successfully logged in."));
+          $row = $result->fetch_assoc();
+          echo json_encode(array("username"   => $username,
+                                 "first_name" => $row["first_name"],
+                                 "last_name"  => $row["last_name"],
+                                 "avatar"     => $row["avatar"],
+                                 "message"    => "Successfully logged in."));
         } else {
           http_response_code(401);
           echo json_encode(array("error" => 401, "message" => "Invalid login details."));
@@ -110,11 +115,42 @@
     echo json_encode($data);
   }
 
+  if ($_GET["type"] == "profile" && $_SERVER["REQUEST_METHOD"] == "POST") {
+    $username   = $_GET["username"];
+    $first_name = $_GET["firstName"];
+    $last_name  = $_GET["lastName"];
+
+    $sql = "update users set ";
+
+    if ($username) {
+      $sql .= " username = '" . $username . "'";
+    }
+
+    if ($first_name) {
+      $sql .= " , first_name = '" . $first_name . "'";
+    }
+
+    if ($last_name) {
+      $sql .= " , last_name = '" . $last_name . "'";
+    }
+
+    $sql .= " where username = '" . $username . "'";
+    $conn->query($sql);
+
+    echo "Profile updated.";
+  }
+
   if ($_GET["type"] == "avatar" && $_SERVER["REQUEST_METHOD"] == "POST") {
+    $username  = $_GET["username"];
+    $file_name = time() . "-" . $_FILES["avatar"]["name"];
+
+    $sql = "update users set avatar = '" . $file_name . "' where username = '" . $username . "'";
+    $conn->query($sql);
+
     $target_dir  = "./images/";
-    $target_file = $target_dir . basename($_FILES["avatar"]["name"]);
+    $target_file = $target_dir . $file_name;
     if (move_uploaded_file($_FILES["avatar"]["tmp_name"], $target_file)) {
-      echo "uploaded...";
+      echo $file_name;
     } else {
       echo $_FILES["avatar"]["error"];
     }
